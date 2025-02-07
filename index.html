@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        #container {
+            color: black;
+            position: relative;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border: 2px solid black;
+            align-items: center;
+            background-color: rgb(135, 211, 211);
+        }
+        .row {
+            display: flex;
+        }
+        .circle {
+            width: 70px;
+            height: 70px;
+            border: 5px solid grey;
+            margin: 15px;
+            border-radius: 35%;
+            background-size: cover;
+            background-color:black;
+
+        }
+        #result{
+            position: absolute;
+            z-index: 3;
+            border: 5px solid black;
+            height: 55vh;
+            width: 50vh;
+            border-radius: 35%;
+            background-color: aqua;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            box-shadow: 5px 5px 5px black;
+        }
+        button{
+            background-color:aquamarine;
+            padding: 10px;
+            box-shadow: 5px 5px 5px black;
+            border-radius: 10px;
+            border: 3px solid black;  
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;     
+            font-style: normal;
+            margin-top: 30px;
+        }
+        @keyframes won {
+            0%{
+                width: 70px;
+                height: 70px;
+                transform: translatez(25px);
+            
+            }
+            25%{
+                width: 80px;
+                height: 80px;
+                transform: translatez(50px);
+
+            }
+            75%{
+                width: 100px;
+                height: 100px;
+                transform: translatez(100px);
+            }
+
+        }
+        .w0n{
+            animation: won 1s linear;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>TIC-TAC-TOE(X/0)</h1>
+        <button onclick="show_winner('1')">SHOW RULES</button>
+        <div id="top" class="row">
+            <div class="circle" id="1"></div>
+            <div class="circle" id="2"></div>
+            <div class="circle" id="3"></div>
+        </div>
+        <div id="middle" class="row">
+            <div class="circle" id="4"></div>
+            <div class="circle" id="5"></div>
+            <div class="circle" id="6"></div>
+        </div>
+        <div id="bottom" class="row">
+            <div class="circle" id="7"></div>
+            <div class="circle" id="8"></div>
+            <div class="circle" id="9"></div>
+        </div>
+        <div id='result'>
+          <span style="width: auto;font-size: 30px;color:black; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: bolder;"></span>
+          <button onclick="location.reload()">RESTART</button>
+
+
+        </div>
+    </div>
+    <p></p>
+    <p></p>
+
+    <script>
+
+        var track = 0;
+        var comp=null;
+        var circles = document.getElementsByClassName('circle');
+        var compare = [
+            [document.getElementById('1'), document.getElementById('2'), document.getElementById('3')],
+            [document.getElementById('4'), document.getElementById('5'), document.getElementById('6')],
+            [document.getElementById('7'), document.getElementById('8'), document.getElementById('9')],
+            [document.getElementById('1'), document.getElementById('4'), document.getElementById('7')],
+            [document.getElementById('2'), document.getElementById('5'), document.getElementById('8')],
+            [document.getElementById('3'), document.getElementById('6'), document.getElementById('9')],
+            [document.getElementById('1'), document.getElementById('5'), document.getElementById('9')],
+            [document.getElementById('3'), document.getElementById('5'), document.getElementById('7')]
+        ];
+
+        var c1_arr = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 4, 7], [2, 5, 8], [3, 6, 9], [1, 5, 9], [3, 5, 7]];
+        var c2_arr = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 4, 7], [2, 5, 8], [3, 6, 9], [1, 5, 9], [3, 5, 7]];
+        var interval = 0;
+
+        function handleClick(event) {
+            var x = event.target;
+            var str = Number(x.id); // Get the id of the clicked element and convert to number
+            if (track % 2 == 0) {
+                x.style.backgroundImage='url("image.png")';
+                // Update c1_arr
+                for (var i = 0; i < c1_arr.length; i++) {
+                    for (var j = 0; j < c1_arr[i].length; j++) {
+                        if (c1_arr[i][j] === str) {
+                            c1_arr[i].splice(j, 1); // Correct usage of splice
+                        }
+                    }
+                }
+            } else {
+                x.style.backgroundImage ='url("o.png")';
+                // Update c2_arr
+                for (var i = 0; i < c2_arr.length; i++) {
+                    for (var j = 0; j < c2_arr[i].length; j++) {
+                        if (c2_arr[i][j] === str) {
+                            c2_arr[i].splice(j, 1); // Correct usage of splice
+                        }
+                    }
+                }
+            }
+            track++;
+            x.removeEventListener('click', handleClick);
+
+            // Check for a winner
+            check_winner();
+        }
+
+        function check_winner() {
+            var iter = 0;
+            var iter_1 = 0;
+            c1_arr.forEach(sub_array => {
+                if (sub_array.length === 0) {
+                    comp = iter;
+                } else {
+                    iter++;
+                }
+            });
+            c2_arr.forEach(sub_array_1 => {
+                if (sub_array_1.length === 0) {
+                    comp = iter_1;
+                } else {
+                    iter_1++;
+                }
+            });
+        if(comp !== null){
+            for (var i = 0; i < compare[comp].length; i++) {
+                compare[comp][i].style.backgroundColor = 'gray';
+                compare[comp][i].style.borderColor = 'black';
+
+
+                compare[comp][i].classList.add('w0n');
+
+            }
+            
+            var wonElements = document.getElementsByClassName('w0n');
+            for (var i = 0; i < wonElements.length; i++) {
+                wonElements[i].addEventListener('animationend', show_winner);
+            }
+        }
+        else if(track===9){
+            document.getElementById('result').style.display = "flex";
+            document.getElementsByTagName('span')[0].innerText = 'Match tie';
+          
+        }
+
+
+        }
+        function show_winner(special){
+            if (special==='1'){
+            document.getElementById('result').style.display="flex";
+            document.getElementById('result').style.width="auto";
+            document.getElementById('result').style.height="auto";
+            document.getElementById('result').style.borderRadius="5px";
+            document.getElementsByTagName('button')[1].innerText='ok';
+
+
+            document.getElementsByTagName('span')[0].innerText='RULES\n1.Players take turns placing their symbol in an empty cell on the grid\n2.The first player usually uses "X" and the second player uses "O"\n3.Players alternate turns until one player gets three of their symbols in a row or the grid is full.';
+
+        }
+           else if( (compare[comp][0]).style.backgroundImage ==='url("image.png")'){
+             document.getElementById('result').style.display="flex";
+             document.getElementsByTagName('h1')[0].style.display='none';
+             document.getElementsByTagName('span')[0].innerText='x wins';
+           }
+           else{
+            document.getElementById('result').style.display="flex";
+            document.getElementsByTagName('h1')[0].style.display='none';
+            document.getElementsByTagName('span')[0].innerText='o wins';
+
+        }
+        
+    }
+            
+        
+
+        for (var i = 0; i < circles.length; i++) {
+            circles[i].addEventListener('click', handleClick);
+        }
+
+    </script>
+</body>
+</html>
